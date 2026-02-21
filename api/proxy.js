@@ -1,21 +1,24 @@
 // api/proxy.js
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import express from 'express';
+import serverless from 'serverless-http';
 
 const app = express();
 
-// Change this to your Python backend IP and port
+// Your Python backend
 const BACKEND_URL = 'http://104.236.237.164:8080';
 
+// Forward everything under /api/*
 app.use(
-  '/api', // Requests to /api/* on Vercel
+  '/api',
   createProxyMiddleware({
     target: BACKEND_URL,
     changeOrigin: true,
     pathRewrite: {
-      '^/api': '', // Remove /api prefix
+      '^/api': '', // Remove /api prefix before sending to backend
     },
   })
 );
 
-export default app;
+// Export as serverless function
+export const handler = serverless(app);
